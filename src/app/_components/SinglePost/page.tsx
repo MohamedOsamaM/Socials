@@ -64,6 +64,9 @@ export default function SinglePost({ postdetail }: any) {
 
         let data = await res.json();
         console.log(data);
+        if (typeof window !== 'undefined') {
+                window.location.href = "/"
+        }
     }
 
     return (
@@ -113,9 +116,9 @@ export default function SinglePost({ postdetail }: any) {
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
                     <form className='mb-3' onSubmit={HandleSubmit}>
-                        <div className='flex flex-row h-12 gap-3'>
+                        <div className='flex flex-row h-7 gap-3'>
                             <input type="text" className='border-orange-500 border-2 focus:border-orange-500 outline-none rounded-lg w-[90%] px-3' name='content' /> 
-                            <button className='rounded-lg w-fit p-2 bg-orange-500 text-white text-sm'>add comment</button>
+                            <button className='rounded-lg w-fit p-2 bg-orange-500 text-white text-sm flex items-center justify-center'>comment</button>
                         </div>
                     </form>
                     {postdetail?.comments.map((comment: any) =>

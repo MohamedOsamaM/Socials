@@ -22,6 +22,9 @@ export default function AddPost() {
             formdata.append('image', image);
         }
         dispatch(addposts(formdata))
+        if (typeof window !== 'undefined') {
+            window.location.href = "/"
+        }
     }
     if (typeof window !== 'undefined') {
         if (localStorage.getItem('usertoken') === null) {
