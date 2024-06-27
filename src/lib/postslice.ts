@@ -70,6 +70,10 @@ const postslice = createSlice({
                 state.isloading = false;
                 // Optionally update state or handle success
                 console.log('Post added successfully:', action.payload);
+                if (typeof window !== 'undefined') {
+                    window.location.href = "/"
+                }
+                
             })
             .addCase(addposts.rejected, (state, action) => {
                 state.isloading = false;
