@@ -32,7 +32,10 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 }));
 
 export default function SinglePost({ postdetail }: any) {
+    const [usernames, setUsernames] = React.useState(localStorage.getItem('username'));
     const [expanded, setExpanded] = React.useState(false);
+    const [commentid, setCommentid] = React.useState<string | null>(null);
+
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
@@ -43,7 +46,7 @@ export default function SinglePost({ postdetail }: any) {
         const form = e.target as HTMLFormElement;
         const contentInput = form.elements.namedItem('content') as HTMLInputElement;
 
-        let creatCommentData = {
+        let createCommentData = {
             "content": contentInput.value,
             "post": `${postdetail.id}`
         };
@@ -54,7 +57,7 @@ export default function SinglePost({ postdetail }: any) {
                 'Content-Type': 'application/json',
                 'token': `${localStorage.getItem('usertoken')}`
             },
-            body: JSON.stringify(creatCommentData)
+            body: JSON.stringify(createCommentData)
         });
 
         if (!res.ok) {
@@ -65,15 +68,59 @@ export default function SinglePost({ postdetail }: any) {
         let data = await res.json();
         console.log(data);
         if (typeof window !== 'undefined') {
-                window.location.href = "/"
+            window.location.href = "/";
         }
     }
 
+    const removeComment = async (cId: any) => {
+        let res = await fetch(`https://linked-posts.routemisr.com/comments/${cId}`, {
+            method: 'DELETE',
+            headers: {
+                token: `${localStorage.getItem('usertoken')}`
+            }
+        });
+        let data = await res.json();
+        console.log(data);
+        window.location.reload()
+    };
+
+    const handleSubmit2 = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const content = form.elements.namedItem('content') as HTMLInputElement;
+
+        if (!content.value) {
+            console.error('Content is required');
+            return;
+        }
+
+        const contentData = {
+            content: content.value,
+        };
+
+        try {
+            const res = await fetch(`https://linked-posts.routemisr.com/comments/${commentid}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'token': `${localStorage.getItem('usertoken')}`
+                },
+                body: JSON.stringify(contentData)
+            });
+
+            const data = await res.json();
+            console.log(data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+        window.location.reload();
+    };
+
     return (
-        <Card className='w-[300px] h-[400px]' sx={{ maxWidth: 345 }}>
+        <Card className='w-[300px]' sx={{ maxWidth: 345 }}>
             <CardHeader
                 avatar={
-                    <Avatar src={postdetail.user.photo} sx={{ bgcolor: red[500] }} aria-label="recipe">
+                    <Avatar src={postdetail?.user.photo} sx={{ bgcolor: red[500] }} aria-label="recipe">
                         R
                     </Avatar>
                 }
@@ -82,19 +129,19 @@ export default function SinglePost({ postdetail }: any) {
                         <MoreVertIcon />
                     </IconButton>
                 }
-                title={postdetail.user.name}
+                title={postdetail?.user.name}
                 subheader="September 14, 2016"
             />
             <CardMedia
                 component="img"
                 height="194"
-                image={postdetail.image}
+                image={postdetail?.image}
                 alt="Paella dish"
                 className='h-[200px]'
             />
             <CardContent>
-                <Typography variant="body2" color="text.secondary" className='line-clamp-1'>
-                    {postdetail.body}
+                <Typography variant="body2" color="text.secondary" className='line-clamp-1 hover:line-clamp-none transition-all'>
+                    {postdetail?.body}
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
@@ -117,19 +164,36 @@ export default function SinglePost({ postdetail }: any) {
                 <CardContent>
                     <form className='mb-3' onSubmit={HandleSubmit}>
                         <div className='flex flex-row h-7 gap-3'>
-                            <input type="text" className='border-orange-500 border-2 focus:border-orange-500 outline-none rounded-lg w-[90%] px-3' name='content' /> 
-                            <button className='rounded-lg w-fit p-2 bg-orange-500 text-white text-sm flex items-center justify-center'>comment</button>
+                            <input type="text" className='border-orange-500 border-2 focus:border-orange-500 outline-none rounded-lg w-[90%] px-3' name='content' />
+                            <button className='rounded-lg w-fit p-2 bg-orange-500 text-white text-sm flex items-center justify-center' type='submit'>Comment</button>
                         </div>
                     </form>
-                    {postdetail?.comments.map((comment: any) =>
+                    {postdetail?.comments.map((comment: any) => (
                         <Box key={comment._id} className='bg-[#f1f1f1] p-[5px] rounded-[10px] m-[2px]'>
                             <Box className="flex items-center">
                                 <Avatar className='w-[30px] h-[30px]' src={comment.commentCreator.photo}></Avatar>
-                                <h5 className='ml-[6px]'>{comment.commentCreator.name}</h5>
+                                <h5 className={usernames === comment.commentCreator.name ? 'ml-[6px] font-bold text-blue-600' : 'ml-[6px]'}>
+                                    {comment.commentCreator.name}
+                                </h5>
                             </Box>
-                            <Typography paragraph>{comment.content}</Typography>
+                            <Typography paragraph sx={{ marginTop: 2 }}>
+                                {usernames === comment.commentCreator.name ? (
+                                    <div className='flex flex-row justify-between items-center'>
+                                        {comment.content}
+                                        <button onClick={() => { removeComment(comment._id); }} className='w-fit text-white p-1 bg-red-500 mb-2'>Delete</button>
+                                    </div>
+                                ) : comment.content}
+                                {usernames === comment.commentCreator.name ? (
+                                    <form className='mb-3' onSubmit={handleSubmit2}>
+                                        <div className='flex flex-row h-7 gap-3'>
+                                            <input type="text" className='border-orange-500 border-2 focus:border-orange-500 outline-none rounded-lg w-[90%] px-3' name='content' />
+                                            <button onClick={() => { setCommentid(comment._id); }} className='rounded-lg w-fit p-2 bg-yellow-500 text-white text-sm flex items-center justify-center' type='submit'>Update</button>
+                                        </div>
+                                    </form>
+                                ) : null}
+                            </Typography>
                         </Box>
-                    )}
+                    ))}
                 </CardContent>
             </Collapse>
         </Card>
