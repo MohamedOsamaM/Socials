@@ -35,11 +35,23 @@ export default function SinglePost({ postdetail }: any) {
     const [usernames, setUsernames] = React.useState(localStorage.getItem('username'));
     const [expanded, setExpanded] = React.useState(false);
     const [commentid, setCommentid] = React.useState<string | null>(null);
-
+    const [commentContainer, setCommentContainer] = React.useState<any>(postdetail?.comments);
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
-
+    const postComments = async (pID: number) => {
+        const token = localStorage.getItem('usertoken');
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+            token: token ? String(token) : '', // Convert token to string or provide a default value
+        };
+        const res = await fetch(`https://linked-posts.routemisr.com/posts/${pID}/comments`, {
+            method: 'GET',
+            headers,
+        });
+        const data = await res.json();
+        setCommentContainer(data.comments);
+    }
     async function HandleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
@@ -66,10 +78,8 @@ export default function SinglePost({ postdetail }: any) {
         }
 
         let data = await res.json();
-        console.log(data);
-        if (typeof window !== 'undefined') {
-            window.location.href = "/";
-        }
+        postComments(postdetail.id)
+       form.content.value = null;
     }
 
     const removeComment = async (cId: any) => {
@@ -79,9 +89,12 @@ export default function SinglePost({ postdetail }: any) {
                 token: `${localStorage.getItem('usertoken')}`
             }
         });
+        interface comment{
+            _id:any
+        }
         let data = await res.json();
-        console.log(data);
-        window.location.reload()
+        let filtered = commentContainer?.filter((comment:comment) => comment?._id !== cId)
+        setCommentContainer(filtered)
     };
 
     const handleSubmit2 = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -107,13 +120,12 @@ export default function SinglePost({ postdetail }: any) {
                 },
                 body: JSON.stringify(contentData)
             });
-
             const data = await res.json();
-            console.log(data);
+            postComments(postdetail.id)
         } catch (error) {
             console.error('Error:', error);
         }
-        window.location.reload();
+        form.content.value = null;
     };
 
     return (
@@ -168,7 +180,7 @@ export default function SinglePost({ postdetail }: any) {
                             <button className='rounded-lg w-fit p-2 bg-orange-500 text-white text-sm flex items-center justify-center' type='submit'>Comment</button>
                         </div>
                     </form>
-                    {postdetail?.comments.map((comment: any) => (
+                    {commentContainer?.map((comment: any) => (
                         <Box key={comment._id} className='bg-[#f1f1f1] p-[5px] rounded-[10px] m-[2px]'>
                             <Box className="flex items-center">
                                 <Avatar className='w-[30px] h-[30px]' src={comment.commentCreator.photo}></Avatar>
@@ -177,13 +189,13 @@ export default function SinglePost({ postdetail }: any) {
                                 </h5>
                             </Box>
                             <Typography paragraph sx={{ marginTop: 2 }}>
-                                {usernames === comment.commentCreator.name ? (
+                                {usernames === comment?.commentCreator?.name ? (
                                     <div className='flex flex-row justify-between items-center'>
                                         {comment.content}
                                         <button onClick={() => { removeComment(comment._id); }} className='w-fit text-white p-1 bg-red-500 mb-2'>Delete</button>
                                     </div>
                                 ) : comment.content}
-                                {usernames === comment.commentCreator.name ? (
+                                {usernames === comment?.commentCreator?.name ? (
                                     <form className='mb-3' onSubmit={handleSubmit2}>
                                         <div className='flex flex-row h-7 gap-3'>
                                             <input type="text" className='border-orange-500 border-2 focus:border-orange-500 outline-none rounded-lg w-[90%] px-3' name='content' />

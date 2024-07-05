@@ -71,7 +71,7 @@ const postslice = createSlice({
                 // Optionally update state or handle success
                 console.log('Post added successfully:', action.payload);
                 if (typeof window !== 'undefined') {
-                    window.location.href = "/"
+                    window.location.href = "/UserPosts"
                 }
                 
             })

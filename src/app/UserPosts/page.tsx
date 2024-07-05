@@ -5,13 +5,14 @@ import CachedIcon from '@mui/icons-material/Cached';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatepost } from '@/lib/updatepostslice';
 import Link from 'next/link';
-
+import { useRouter } from 'next/router';
 type Post = {
     _id: number;
     // Add other post properties here if needed
 };
 
 export default function UserPosts() {
+
     const { postid } = useSelector((state: any) => state.update);
     const dispatch = useDispatch();
     const [isloading, setIsloading] = useState(true);
@@ -41,7 +42,7 @@ export default function UserPosts() {
             }
         });
         await res.json();
-        window.location.href = '/UserPosts';
+        getdata()
     };
 
     const updatePost = (pId: number) => {
