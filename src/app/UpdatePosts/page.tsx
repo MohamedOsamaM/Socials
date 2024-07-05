@@ -61,8 +61,7 @@ export default function UpdatePosts() {
         throw new Error('Network response was not ok');
       }
       const data = await res.json();
-      console.log(data);
-      window.location.href = '/';
+      window.location.href = '/UserPosts';
     } catch (error) {
       console.error('Failed to update post:', error);
     }
