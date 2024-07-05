@@ -22,8 +22,8 @@ const Navbar: React.FC = () => {
     <nav className="bg-white border-gray-200 dark:bg-gray-900 z-[99999] sticky top-0 left-0 right-0">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <Image src={logo} alt="logo" className="rounded-full h-auto w-auto" style={{ width: '50px', height: 'auto' }} />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Socials</span>
+          <Image src={logo} alt="logo" className="rounded-full" style={{ width: '30px', height: '30px' }} />
+          <span className="self-center text-lg font-semibold whitespace-nowrap dark:text-white">Socials</span>
         </Link>
         <button
           onClick={handleToggle}
