@@ -15,6 +15,8 @@ import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Box from '@mui/material/Box';
+import { relative } from 'path';
+import { Translate } from '@mui/icons-material';
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -79,7 +81,7 @@ export default function SinglePost({ postdetail }: any) {
 
         let data = await res.json();
         postComments(postdetail.id)
-       form.content.value = null;
+        form.content.value = null;
     }
 
     const removeComment = async (cId: any) => {
@@ -89,11 +91,11 @@ export default function SinglePost({ postdetail }: any) {
                 token: `${localStorage.getItem('usertoken')}`
             }
         });
-        interface comment{
-            _id:any
+        interface comment {
+            _id: any
         }
         let data = await res.json();
-        let filtered = commentContainer?.filter((comment:comment) => comment?._id !== cId)
+        let filtered = commentContainer?.filter((comment: comment) => comment?._id !== cId)
         setCommentContainer(filtered)
     };
 
@@ -136,13 +138,9 @@ export default function SinglePost({ postdetail }: any) {
                         R
                     </Avatar>
                 }
-                action={
-                    <IconButton aria-label="settings">
-                        <MoreVertIcon />
-                    </IconButton>
-                }
+
                 title={postdetail?.user.name}
-                subheader="September 14, 2016"
+
             />
             <CardMedia
                 component="img"
@@ -156,13 +154,7 @@ export default function SinglePost({ postdetail }: any) {
                     {postdetail?.body}
                 </Typography>
             </CardContent>
-            <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites">
-                    <FavoriteIcon />
-                </IconButton>
-                <IconButton aria-label="share">
-                    <ShareIcon />
-                </IconButton>
+            <CardActions disableSpacing className='relative md:top-[18px] md:left-[240px] top-[-5px] left-[385px]  w-fit  rounded-full'>
                 <ExpandMore
                     expand={expanded}
                     onClick={handleExpandClick}
