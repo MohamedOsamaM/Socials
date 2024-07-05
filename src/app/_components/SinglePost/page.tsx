@@ -129,7 +129,7 @@ export default function SinglePost({ postdetail }: any) {
     };
 
     return (
-        <Card className='min-h-[400px] w-[400px]' >
+        <Card className='min-h-[400px] w-[300px]' >
             <CardHeader
                 avatar={
                     <Avatar src={postdetail?.user.photo} sx={{ bgcolor: red[500] }} aria-label="recipe">
